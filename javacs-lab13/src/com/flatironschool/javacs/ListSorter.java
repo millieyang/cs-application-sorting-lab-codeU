@@ -63,9 +63,45 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public List<T> mergeSort(List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
-        return null;
+       if (list.size() <= 1) {
+    	   return list;
+       }
+       int sizeOfList = list.size();
+       List<T> firstHalf = mergeSort(new LinkedList<T>(list.subList(0, sizeOfList/2)), comparator);
+       List<T> secondHalf = mergeSort(new LinkedList<T>(list.subList(sizeOfList/2, sizeOfList)), comparator);
+       
+       return merge(firstHalf, secondHalf, comparator);
+       
 	}
+	
+	private List<T> merge (List<T> firstHalf, List<T> secondHalf, Comparator<T> comparator) {
+		int size = firstHalf.size() + secondHalf.size();
+		List<T> sortedList = new LinkedList<T>();
+		for (int i=0; i < size ; i++) {
+			while (secondHalf.size() > 0 && firstHalf.size() > 0) {
+				int comparatorNumber = comparator.compare(firstHalf.get(0), secondHalf.get(0));
+				if (comparatorNumber != 0 && comparatorNumber > 0 ) {
+					sortedList.add(secondHalf.remove(0));
+				}
+				else {
+					sortedList.add(firstHalf.remove(0));
+				}
+			}
+			if (firstHalf.size() == 0 && secondHalf.size() == 0) {
+				break;
+			}
+			else if (secondHalf.size() == 0) {
+				sortedList.add(firstHalf.remove(0));
+			}
+			else if(firstHalf.size() == 0) {
+				sortedList.add(secondHalf.remove(0));
+			}
+						
+		}
+		return sortedList;
+		
+	}
+	
 
 	/**
 	 * Sorts a list using a Comparator object.
@@ -75,7 +111,14 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public void heapSort(List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
+        PriorityQueue<T> heap  = new PriorityQueue<T>(comparator);
+        for (T element : list) {
+        	heap.offer(element);
+        }
+        list.clear();
+        while (!heap.isEmpty()) {
+        	list.add(heap.poll());
+        }
 	}
 
 	
@@ -89,8 +132,27 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public List<T> topK(int k, List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
-        return null;
+		PriorityQueue<T> heap  = new PriorityQueue(list.size(), comparator);
+		for (T element : list) {
+			if (heap.size() < k) {
+				heap.offer(element);
+			}
+			else if (heap.size() == k) {
+				T elementToCompare = heap.peek();
+				int comp = comparator.compare(elementToCompare, element);
+				if (comp < 0) {
+					heap.poll();
+					heap.offer(element);
+				}
+			}
+		}
+		list.clear();
+		
+		while (!heap.isEmpty()) {
+			list.add(heap.poll());
+		}
+		
+        return list;
 	}
 
 	
